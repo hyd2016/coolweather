@@ -2,6 +2,7 @@ package com.example.coolweather;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +36,7 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public class ChooseAreaFragment extends Fragment {
+    private static final String TAG = "ChooseAreaFragment";
     public static final int LEVEL_PROVINCE = 0;
     public static final int LEVEL_CITY = 1;
     public static final int LEVEL_COUNTY = 2;
@@ -138,7 +140,7 @@ public class ChooseAreaFragment extends Fragment {
         titleText.setText(selectedProvince.getProvinceName());
         backButton.setVisibility(View.VISIBLE);
         cItyList = DataSupport.where("provinceid = ?",String .valueOf(selectedProvince.getId())).find(CIty.class);
-
+        Log.d(TAG, "queryCities: " + cItyList);
         if (cItyList.size()>0){
             dataLIst.clear();
             for (CIty cIty:cItyList){
@@ -150,7 +152,7 @@ public class ChooseAreaFragment extends Fragment {
 
         }else {
             int provinceCode = selectedProvince.getProvinceCode();
-            String address = "http://guolin.tech/api/china" + provinceCode;
+            String address = "http://guolin.tech/api/china/" + provinceCode;
             queryFromServer(address,"city");
         }
     }
@@ -174,7 +176,7 @@ public class ChooseAreaFragment extends Fragment {
         }else {
             int provinceCode = selectedProvince.getProvinceCode();
             int cityCode = selectedCity.getCityCode();
-            String address = "http://guolin.tech/api/china" + provinceCode + "/" + cityCode;
+            String address = "http://guolin.tech/api/china/" + provinceCode + "/" + cityCode;
             queryFromServer(address,"county");
         }
 
@@ -186,6 +188,7 @@ public class ChooseAreaFragment extends Fragment {
      * @param type
      */
     private void queryFromServer(String address, final String type) {
+        Log.d(TAG, "queryFromServer: "+ address);
         showProgressDialog();
         HttpUtil.sendOkHttpRequest(address, new Callback() {
             @Override
@@ -198,7 +201,7 @@ public class ChooseAreaFragment extends Fragment {
 
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                String responseText = response.body().string();
+                String responseText = Objects.requireNonNull(response.body()).string();
                 boolean result = false;
                 if ("province".equals(type)){
                     result = Utility.handleProvinceResponse(responseText);
