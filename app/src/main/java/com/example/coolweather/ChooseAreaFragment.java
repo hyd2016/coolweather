@@ -104,6 +104,7 @@ public class ChooseAreaFragment extends Fragment {
                     WeatherActivity activity = (WeatherActivity) getActivity();
                     activity.drawerLayout.closeDrawers();
                     activity.swipeRefreshLayout.setRefreshing(true);
+
                     activity.requestWeather(weatherId);
                 }
 
